@@ -1,0 +1,47 @@
+## .NET / ASP.NET Core
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Publish output
+publish/
+out/
+
+## NuGet
+*.nupkg
+*.snupkg
+.nuget/
+
+## Visual Studio
+.vs/
+*.rsuser
+*.dbmdl
+*.jfm
+
+## Rider / JetBrains
+.idea/
+*.sln.iml
+
+## VS Code
+.vscode/
+
+## ASP.NET Core secrets & config overrides
+appsettings.Development.json
+secrets.json
+
+## EF Core migrations can be kept, but exclude temp files
+*.db
+*.db-shm
+*.db-wal
+
+## OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+## Logs
+*.log
+logs/
