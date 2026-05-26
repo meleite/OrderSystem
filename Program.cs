@@ -38,6 +38,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddEndpointsApiExplorer(); builder.Services.AddSwaggerGen(); 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -58,5 +60,8 @@ app.UseAuthorization();
 app.UseStaticFiles();
 app.MapRazorPages();
 app.MapControllers();
+
+app.UseSwagger(); 
+app.UseSwaggerUI();
 
 app.Run();

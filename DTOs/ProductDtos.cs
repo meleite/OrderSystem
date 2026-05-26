@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations;
 namespace OrderSystem.DTOs;
 
 public record ProductRequest(
-    [property: Required, MaxLength(200)] string Name,
+    [Required, MaxLength(200)] string Name,
     string? Description,
-    [property: Range(0.01, 1_000_000_000.0)] decimal Price,
-    [property: Range(0, int.MaxValue)] int StockQuantity,
+    [Range(0.01, 1_000_000_000.0)] decimal Price,
+    [Range(0, int.MaxValue)] int StockQuantity,
     string? Category
 );
 

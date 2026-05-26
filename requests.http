@@ -1,0 +1,117 @@
+@baseUrl = http://localhost:5239
+@token = PASTE_TOKEN_HERE
+
+### ─── AUTH ───────────────────────────────────────────────
+
+### Register a new user
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Alice",
+  "email": "alice@example.com",
+  "password": "password123"
+}
+
+### Register an admin (manually set Role="Admin" in DB, or register then update)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Admin",
+  "email": "admin@example.com",
+  "password": "adminpass123"
+}
+
+### Login — copy the token from the response into @token above
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@example.com",
+  "password": "password123"
+}
+
+### ─── PRODUCTS (public) ──────────────────────────────────
+
+### Get all active products (paged)
+GET {{baseUrl}}/api/products
+
+### Get products with search/filter/paging
+GET {{baseUrl}}/api/products?search=shirt&category=Clothing&minPrice=10&maxPrice=100&page=1&pageSize=5
+
+### Get single product
+GET {{baseUrl}}/api/products/1
+
+### ─── PRODUCTS (Admin only) ──────────────────────────────
+
+### Create product
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Blue T-Shirt",
+  "description": "100% cotton",
+  "price": 19.99,
+  "stockQuantity": 50,
+  "category": "Clothing"
+}
+
+### Update product
+PUT {{baseUrl}}/api/products/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Blue T-Shirt (Updated)",
+  "description": "100% cotton, slim fit",
+  "price": 24.99,
+  "stockQuantity": 40,
+  "category": "Clothing"
+}
+
+### Soft-delete product
+DELETE {{baseUrl}}/api/products/1
+Authorization: Bearer {{token}}
+
+### ─── ORDERS ─────────────────────────────────────────────
+
+### Create order (authenticated user)
+POST {{baseUrl}}/api/orders
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "items": [
+    { "productId": 1, "quantity": 2 },
+    { "productId": 2, "quantity": 1 }
+  ]
+}
+
+### Get my orders
+GET {{baseUrl}}/api/orders/me
+Authorization: Bearer {{token}}
+
+### Get order by id
+GET {{baseUrl}}/api/orders/1
+Authorization: Bearer {{token}}
+
+### Update order status (Admin only)
+PATCH {{baseUrl}}/api/orders/1/status
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "status": "Shipped"
+}
+
+### ─── REPORTS (Admin only) ───────────────────────────────
+
+### Sales report grouped by month
+GET {{baseUrl}}/api/reports/sales?startDate=2026-01-01&endDate=2026-12-31&groupBy=month
+Authorization: Bearer {{token}}
+
+### Sales report grouped by year
+GET {{baseUrl}}/api/reports/sales?groupBy=year
+Authorization: Bearer {{token}}

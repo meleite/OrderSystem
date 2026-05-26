@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\OrderSystem.csproj": {}
+    "c:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\OrderSystem.csproj": {}
   },
   "projects": {
-    "C:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\OrderSystem.csproj": {
+    "c:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\OrderSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\OrderSystem.csproj",
+        "projectUniqueName": "c:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\OrderSystem.csproj",
         "projectName": "OrderSystem",
-        "projectPath": "C:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\OrderSystem.csproj",
+        "projectPath": "c:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\OrderSystem.csproj",
         "packagesPath": "C:\\Users\\marianaleite\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\obj\\",
+        "outputPath": "c:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\marianaleite\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -66,6 +66,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[8.*, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[10.1.7, )"
             }
           },
           "imports": [

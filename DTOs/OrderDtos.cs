@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations;
 namespace OrderSystem.DTOs;
 
 public record CreateOrderItemRequest(
-    [property: Range(1, int.MaxValue)] int ProductId,
-    [property: Range(1, int.MaxValue)] int Quantity
+    [Range(1, int.MaxValue)] int ProductId,
+    [Range(1, int.MaxValue)] int Quantity
 );
 
 public record CreateOrderRequest(
-    [property: Required] IList<CreateOrderItemRequest> Items
+    [Required] IList<CreateOrderItemRequest> Items
 );
 
 public record OrderItemResponse(
@@ -30,5 +30,5 @@ public record OrderResponse(
 );
 
 public record UpdateOrderStatusRequest(
-    [property: Required] string Status
+    [Required] string Status
 );
