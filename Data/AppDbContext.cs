@@ -36,7 +36,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Order>(e =>
         {
             e.HasKey(o => o.Id);
-            e.Property(o => o.TotalAmount).HasColumnType("decimal(18,2)");
+            e.Property(o => o.TotalPrice).HasColumnType("decimal(18,2)");
             e.Property(o => o.Status).HasConversion<string>().HasMaxLength(50);
 
             e.HasOne(o => o.User)
@@ -49,6 +49,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<OrderItem>(e =>
         {
             e.HasKey(oi => oi.Id);
+            e.Property(oi => oi.UnitPrice).HasColumnType("decimal(18,2)");
+            e.Property(oi => oi.LineTotal).HasColumnType("decimal(18,2)");
 
             e.HasOne(oi => oi.Order)
              .WithMany(o => o.Items)

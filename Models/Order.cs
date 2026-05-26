@@ -16,12 +16,12 @@ public class Order : BaseEntity
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
     public string? ShippingAddress { get; set; }
 
-    // Encapsulation: TotalAmount can only be updated via RecalculateTotal()
-    public decimal TotalAmount { get; private set; }
+    // Encapsulation: TotalPrice can only be updated via RecalculateTotal()
+    public decimal TotalPrice { get; private set; }
 
     public void RecalculateTotal()
     {
-        TotalAmount = Items.Sum(i => i.Product.Price * i.Quantity);
+        TotalPrice = Items.Sum(i => i.UnitPrice * i.Quantity);
     }
 
     // Navigation properties
@@ -29,5 +29,5 @@ public class Order : BaseEntity
     public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
 
     // Polymorphism: meaningful override of BaseEntity.ToString()
-    public override string ToString() => $"Order [Id={Id}, UserId={UserId}, Status={Status}, Total={TotalAmount:C}]";
+    public override string ToString() => $"Order [Id={Id}, UserId={UserId}, Status={Status}, Total={TotalPrice:C}]";
 }
