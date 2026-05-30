@@ -27,8 +27,12 @@ public class ProductQueryParams
     public string? Category { get; set; }
     public decimal? MinPrice { get; set; }
     public decimal? MaxPrice { get; set; }
+    public bool? InStock { get; set; }
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 20;
+    /// <summary>Accepted values: name, price, createdAt, category, stock</summary>
+    public string SortBy { get; set; } = "name";
+    public bool SortDesc { get; set; } = false;
 }
 
 public record PagedResult<T>(IEnumerable<T> Items, int TotalCount, int Page, int PageSize);

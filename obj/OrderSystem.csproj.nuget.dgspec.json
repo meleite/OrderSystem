@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\OrderSystem.csproj": {}
+    "C:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\OrderSystem.csproj": {}
   },
   "projects": {
-    "c:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\OrderSystem.csproj": {
+    "C:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\OrderSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\OrderSystem.csproj",
+        "projectUniqueName": "C:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\OrderSystem.csproj",
         "projectName": "OrderSystem",
-        "projectPath": "c:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\OrderSystem.csproj",
+        "projectPath": "C:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\OrderSystem.csproj",
         "packagesPath": "C:\\Users\\marianaleite\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\obj\\",
+        "outputPath": "C:\\Users\\marianaleite\\OneDrive - Microsoft\\Documents\\Code Projects\\OrderSystem\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\marianaleite\\AppData\\Roaming\\NuGet\\NuGet.Config"

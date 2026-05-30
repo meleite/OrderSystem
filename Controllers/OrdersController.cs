@@ -28,23 +28,37 @@ public class OrdersController : ControllerBase
         if (req.Items == null || req.Items.Count == 0)
             return BadRequest(new { message = "Order must contain at least one item." });
 
-        var productIds = req.Items.Select(i => i.ProductId).ToList();
+        // Aggregate quantities per product so that duplicate line items for the
+        // same product are treated as a single combined demand during stock check.
+        var quantityByProduct = req.Items
+            .GroupBy(i => i.ProductId)
+            .ToDictionary(g => g.Key, g => g.Sum(i => i.Quantity));
+
+        // RepeatableRead prevents a concurrent transaction from modifying the rows
+        // we read between our stock check and our stock decrement (TOCTOU race).
+        await using var tx = await _db.Database.BeginTransactionAsync(
+            System.Data.IsolationLevel.RepeatableRead);
+
         var products = await _db.Products
-            .Where(p => productIds.Contains(p.Id) && p.IsActive)
+            .Where(p => quantityByProduct.Keys.Contains(p.Id) && p.IsActive)
             .ToListAsync();
 
-        var missingIds = productIds.Except(products.Select(p => p.Id)).ToList();
+        // Rule: all requested product IDs must exist and be active.
+        var missingIds = quantityByProduct.Keys.Except(products.Select(p => p.Id)).ToList();
         if (missingIds.Count > 0)
             return BadRequest(new { message = $"Products not found or inactive: {string.Join(", ", missingIds)}." });
 
-        var stockErrors = req.Items
-            .Where(i => products.First(p => p.Id == i.ProductId).StockQuantity < i.Quantity)
-            .Select(i => $"Product {i.ProductId} has insufficient stock.")
+        // Rule: StockQuantity must cover the total quantity requested per product.
+        var stockErrors = products
+            .Where(p => p.StockQuantity < quantityByProduct[p.Id])
+            .Select(p => $"Product {p.Id} ({p.Name}) has insufficient stock. " +
+                         $"Available: {p.StockQuantity}, requested: {quantityByProduct[p.Id]}.")
             .ToList();
 
         if (stockErrors.Count > 0)
             return UnprocessableEntity(new { message = "Stock validation failed.", errors = stockErrors });
 
+        // Rule: initial status is always Pending; only admin may change it.
         var order = new Order
         {
             UserId = CurrentUserId,
@@ -55,7 +69,8 @@ public class OrdersController : ControllerBase
         foreach (var item in req.Items)
         {
             var product = productMap[item.ProductId];
-            product.StockQuantity -= item.Quantity;
+            // Rule: persist the price at time of purchase so historical orders
+            // remain accurate even if the product price changes later.
             order.Items.Add(new OrderItem
             {
                 ProductId = item.ProductId,
@@ -63,11 +78,17 @@ public class OrdersController : ControllerBase
                 UnitPrice = product.Price,
                 LineTotal = product.Price * item.Quantity
             });
+            // Decrement stock; saved atomically with the order in the same transaction.
+            product.StockQuantity -= item.Quantity;
         }
 
         order.RecalculateTotal();
         _db.Orders.Add(order);
+
+        // Single SaveChangesAsync call: order, order items, and stock updates all
+        // go to the database inside the open RepeatableRead transaction.
         await _db.SaveChangesAsync();
+        await tx.CommitAsync();
 
         return CreatedAtAction(nameof(GetById), new { id = order.Id },
             new OrderResponse(

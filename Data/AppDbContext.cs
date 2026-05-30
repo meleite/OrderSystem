@@ -22,6 +22,9 @@ public class AppDbContext : DbContext
             e.Property(u => u.Email).IsRequired().HasMaxLength(200);
             e.Property(u => u.PasswordHash).IsRequired();
             e.Property(u => u.Role).IsRequired().HasMaxLength(50);
+
+            // Enforces uniqueness at the DB level and speeds up login lookups.
+            e.HasIndex(u => u.Email).IsUnique().HasDatabaseName("UX_Users_Email");
         });
 
         // Product
@@ -30,6 +33,19 @@ public class AppDbContext : DbContext
             e.HasKey(p => p.Id);
             e.Property(p => p.Name).IsRequired().HasMaxLength(200);
             e.Property(p => p.Price).HasColumnType("decimal(18,2)");
+            e.Property(p => p.Category).HasMaxLength(100);  // required to be indexable (no max columns in SQL Server indexes)
+
+            // Supports ORDER BY Name and prefix searches.
+            e.HasIndex(p => p.Name)
+             .HasDatabaseName("IX_Products_Name");
+
+            // Covers the most common public filter: active products in a category.
+            e.HasIndex(p => new { p.IsActive, p.Category })
+             .HasDatabaseName("IX_Products_IsActive_Category");
+
+            // Covers price-range filters on active products.
+            e.HasIndex(p => new { p.IsActive, p.Price })
+             .HasDatabaseName("IX_Products_IsActive_Price");
         });
 
         // Order
@@ -43,6 +59,16 @@ public class AppDbContext : DbContext
              .WithMany(u => u.Orders)
              .HasForeignKey(o => o.UserId)
              .OnDelete(DeleteBehavior.Cascade);
+
+            // Composite (UserId, CreatedAt): covers "my orders" queries sorted/filtered by date.
+            // UserId is the leftmost column so it also satisfies FK lookups, suppressing the
+            // auto-generated plain IX_Orders_UserId index.
+            e.HasIndex(o => new { o.UserId, o.CreatedAt })
+             .HasDatabaseName("IX_Orders_UserId_CreatedAt");
+
+            // Standalone CreatedAt for admin/reporting queries that range across all orders.
+            e.HasIndex(o => o.CreatedAt)
+             .HasDatabaseName("IX_Orders_CreatedAt");
         });
 
         // OrderItem

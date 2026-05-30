@@ -15,10 +15,13 @@ public class ProductsController : ControllerBase
 
     public ProductsController(AppDbContext db) => _db = db;
 
+    private bool IsAdmin => User.IsInRole("Admin");
+
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] ProductQueryParams q)
     {
-        var query = _db.Products.Where(p => p.IsActive);
+        // Admins can browse inactive products; regular users only see active ones.
+        var query = IsAdmin ? _db.Products.AsQueryable() : _db.Products.Where(p => p.IsActive);
 
         if (!string.IsNullOrWhiteSpace(q.Search))
             query = query.Where(p =>
@@ -34,12 +37,31 @@ public class ProductsController : ControllerBase
         if (q.MaxPrice.HasValue)
             query = query.Where(p => p.Price <= q.MaxPrice.Value);
 
+        if (q.InStock.HasValue)
+            query = q.InStock.Value
+                ? query.Where(p => p.StockQuantity > 0)
+                : query.Where(p => p.StockQuantity == 0);
+
         var total = await query.CountAsync();
         var pageSize = Math.Clamp(q.PageSize, 1, 100);
         var page = Math.Max(q.Page, 1);
 
+        // Apply sort before pagination so paging is stable across pages.
+        query = (q.SortBy?.ToLowerInvariant(), q.SortDesc) switch
+        {
+            ("price",     false) => query.OrderBy(p => p.Price),
+            ("price",     true)  => query.OrderByDescending(p => p.Price),
+            ("createdat", false) => query.OrderBy(p => p.CreatedAt),
+            ("createdat", true)  => query.OrderByDescending(p => p.CreatedAt),
+            ("category",  false) => query.OrderBy(p => p.Category).ThenBy(p => p.Name),
+            ("category",  true)  => query.OrderByDescending(p => p.Category).ThenBy(p => p.Name),
+            ("stock",     false) => query.OrderBy(p => p.StockQuantity),
+            ("stock",     true)  => query.OrderByDescending(p => p.StockQuantity),
+            (_,           false) => query.OrderBy(p => p.Name),          // default: name asc
+            (_,           true)  => query.OrderByDescending(p => p.Name)
+        };
+
         var items = await query
-            .OrderBy(p => p.Name)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(p => new ProductResponse(
@@ -54,7 +76,7 @@ public class ProductsController : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var p = await _db.Products.FindAsync(id);
-        if (p is null || !p.IsActive) return NotFound();
+        if (p is null || (!p.IsActive && !IsAdmin)) return NotFound();
 
         return Ok(new ProductResponse(
             p.Id, p.Name, p.Description, p.Price,
